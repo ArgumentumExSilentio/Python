@@ -1,0 +1,79 @@
+'''
+бот вк для питон python 2020 
+Он может отвечать и на лс и на беседу
+В коде есть две части - для лс и для беседы
+Использовать две сразу в одной программе нельзя
+Longpool слушает либо пользовательские обращения, либо из чатов
+Заключить ненужную часть в три одинарные кавычки как это текст
+Она будет деактивирована, оставшаяся будет нормально работать
+Vk бот 2020 на python 
+Читать код внимательно, чтобы не пропустить важные моменты
+'''
+
+import random, vk_api, vk
+from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+from vk_api.utils import get_random_id
+vk_session = vk_api.VkApi(token='ввести токен сюда')
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+longpoll = VkBotLongPoll(vk_session, 'ввести id группы сюда без одинарных кавычек')
+vk = vk_session.get_api()
+from vk_api.longpoll import VkLongPoll, VkEventType
+Lslongpoll = VkLongPoll(vk_session)
+Lsvk = vk_session.get_api()
+
+keyboard = VkKeyboard(one_time=True)
+keyboard.add_button('Привет', color=VkKeyboardColor.NEGATIVE)
+keyboard.add_button('Клавиатура', color=VkKeyboardColor.POSITIVE)
+keyboard.add_line()
+keyboard.add_location_button()
+keyboard.add_line()
+keyboard.add_vkpay_button(hash="action=transfer-to-group&group_id='id группы без одинарных кавычек'")
+
+#это часть бота vk для ответа на сообщения в беседе
+for event in longpoll.listen():
+    if event.type == VkBotEventType.MESSAGE_NEW:
+         if 'Ку' in str(event) or 'Привет' in str(event) or 'Хай' in str(event) or 'Хелло' in str(event) or 'Хеллоу' in str(event):
+         	if event.from_chat:
+#https://vk.com/dev/groups.getLongPollServer
+#перейти по этой ссылке, быть авторизованным в вк(!), и ввести id группы чтобы получить key, server и ts
+#ввести key, server и ts в соответствующие поля
+                 vk.messages.send(
+                	key = (''),
+                	server = ('https://lp.vk.com/wh183415444'),
+                	ts=('3539'),
+                	random_id = get_random_id(),
+              	  message='Привет!',
+            	    chat_id = event.chat_id
+         	       )
+#ввести те же самые key, server и ts
+         if 'Клавиатура' in str(event):
+         	if event.from_chat:
+                 vk.messages.send(
+                 	keyboard = keyboard.get_keyboard(),
+                        key = ('21b7e67abf6b938c8223242c37b4ff873efe1453'),
+                 	server = ('https://lp.vk.com/wh183415444'),
+                 	ts=('3539'),
+                 	random_id = get_random_id(),
+              	   message='Держи',
+             	    chat_id = event.chat_id
+         	        )
+#дальше часть для ответа бота вк на ЛС
+for event in Lslongpoll.listen():
+    if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
+        vars1 = ['Привет', 'Ку', 'Хай', 'Хеллоу']
+        if event.text in vars1:
+            if event.from_user:
+                Lsvk.messages.send(
+                    user_id = event.user_id,
+                    message = 'Привет)',
+                    random_id = get_random_id()
+                    )
+            vars2 = ['Клавиатура', 'клавиатура']
+        if event.text in vars2:
+            if event.from_user:
+                Lsvk.messages.send(
+                    user_id = event.user_id,
+                    random_id = get_random_id(),
+                    keyboard = keyboard.get_keyboard(),
+                    message = 'Держи'
+                    )
